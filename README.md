@@ -19,18 +19,18 @@ Project repository to practice web scraping, database creation and normalization
 ----
 __Phase 1 - Data model planning__
 - Plan desired data/information for project
-- Normalize data model
-- Create and document ERD
+- Create and document draft ERD
 
-__Phase 2 - Database creation__
-- Create SQL Server database
-- Create database table
-- Create foundational stored procedures
-
-__Phase 3 - Web scraping__
+__Phase 2 - Web scraping__
 - Locate web pages/URLs with FBS football schedules and associated data
 - Research and get familiarized with web scraping in Python
 - Write python web scraping script(s)
+
+__Phase 3 - Database creation__
+- Normalize data model
+- Create SQL Server database
+- Create database table
+- Create foundational stored procedures
 
 __Phase 4 - Extract, Transact, Load__
 - Limit web scraping scripts to relevant HTML elements/data fields

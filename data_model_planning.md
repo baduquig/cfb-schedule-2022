@@ -1,0 +1,16 @@
+# Data model planning
+
+## Potential data fields (rough draft)
+| FIELD_NAME | DATA_TYPE | LENGTH |
+| --- | --- | ---: |
+| TEAM_ID | NUMBER | 5 |
+| SCHOOL_NAME | TEXT | 64 |
+| TEAM_MASCOT | TEXT | 64 |
+| TEAM_CONFERENCE_ID | NUMBER | 4 |
+| CONFERENCE_NAME | TEXT | 32 |
+| GAME_ID | NUMBER | 12 |
+| GAME_TIME | DATETIME | HH:MM XM |
+| WEEK_NUMBER | NUMBER | 2 |
+| GAME_LOCATION_DESCR | TEXT | 64 |
+| LOCATION_LAT | DECIMAL | 3,10 |
+| LOCATION_LONG | DECIMAL | 3,10 |
