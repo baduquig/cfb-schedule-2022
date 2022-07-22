@@ -55,6 +55,8 @@ __Phase 4 - Database creation__
 - Create database and tables
 
 __Phase 5 - Data load__
+- Locate latitude/longitude API for game locations
+- Create team-conference dictionary
 - Insert parsed data into database
 
 __Phase 6 - Visualization skeleton__
