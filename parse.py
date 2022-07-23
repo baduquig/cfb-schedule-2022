@@ -3,13 +3,9 @@
 #
 #
 #
-
-from datetime import date
-import html
-from random import betavariate
-from turtle import home
-from numpy import printoptions
+import dateutil
 import requests
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 sched_page = 'https://www.espn.com/college-football/schedule/_/week/'
@@ -27,6 +23,27 @@ def get_team_id(url_str):
     team_id = url_str[begin_idx + 4:end_idx]
     return team_id
 
+def convert_zulu_to_standard(z_time_str):
+    colon_index = z_time_str.index(':')
+    zulu_hour = int(z_time_str[:colon_index])
+    zulu_min = z_time_str[colon_index + 1:]
+
+    if zulu_hour < 6:
+        zulu_hour += 6
+        am_pm = 'PM'
+    elif zulu_hour >= 6 and zulu_hour < 18:
+        zulu_hour -= 6
+        am_pm = 'AM'
+    elif zulu_hour == 18:
+        zulu_hour -= 8
+        am_pm = 'PM'
+    else:
+        zulu_hour -= 18
+        am_pm = 'PM'
+
+    standard_time = str(zulu_hour) + ':' + str(zulu_min) + ' ' + am_pm
+    return standard_time
+
 def get_game_time(html_td_str):
     start_idx = html_td_str.rfind('/')
     game_url = 'https://www.espn.com/college-football/game/_/gameId/' + html_td_str[start_idx + 1:]
@@ -40,7 +57,9 @@ def get_game_time(html_td_str):
     else:
         begin_idx = game_dttm.index('T')
         end_idx = game_dttm.index('Z')
-        game_time = game_dttm[begin_idx + 1:end_idx]
+        game_time_zulu = game_dttm[begin_idx + 1:end_idx]
+        game_time = convert_zulu_to_standard(game_time_zulu)
+
     return game_time
 
 for week in range(season_len):
