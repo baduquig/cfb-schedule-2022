@@ -3,8 +3,11 @@
 #
 #
 #
-import requests
+import requests, pyodbc
 from bs4 import BeautifulSoup
+
+conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=GABE_PC\SQLEXPRESS;DATABASE=cfb_schedule')
+cursor = conn.cursor()
 
 team_page = 'https://www.espn.com/college-football/team/_/id/'
 team_id_list = []

@@ -3,8 +3,11 @@
 #
 #
 #
-import requests
+import requests, pyodbc
 from bs4 import BeautifulSoup
+
+conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};Server=GABE_PC\SQLEXPRESS;Database=cfb_schedule;Trusted_Connection=yes')
+cursor = conn.cursor()
 
 sched_page = 'https://www.espn.com/college-football/schedule/_/week/'
 season_len = 13
@@ -26,14 +29,14 @@ def convert_zulu_to_standard(z_time_str):
     zulu_min = z_time_str[colon_index + 1:]
 
     if zulu_hour < 6:
-        zulu_hour += 6
+        zulu_hour += 4
         am_pm = 'PM'
     elif zulu_hour >= 6 and zulu_hour < 18:
         zulu_hour -= 6
         am_pm = 'AM'
     elif zulu_hour == 18:
-        zulu_hour -= 8
-        am_pm = 'PM'
+        zulu_hour -= 7
+        am_pm = 'AM'
     else:
         zulu_hour -= 18
         am_pm = 'PM'
@@ -60,7 +63,9 @@ def get_game_time(game_id):
     return game_time
 
 def parse_schedule_page(season_len, sched_page):
-    games_dict = {}
+    cursor.execute('EXEC drop_tables; EXEC create_schedule_db;')
+    cursor.commit()
+
     for week in range(season_len):
         req = requests.get(sched_page + str(week + 1))
         soup = BeautifulSoup(req.content, 'html.parser')
@@ -81,11 +86,14 @@ def parse_schedule_page(season_len, sched_page):
                 location = game_data[5].text
                 game_week_num = week + 1
                 game_time = get_game_time(game_id)
-
                 
-
                 print('Game week: {} | Game day: {} | Game ID: {} | Away Team ID: {} | Home Team ID: {} | Location: {} | Game time: {}'
                         .format(game_week_num, game_day, game_id, away_team_id, home_team_id, location, game_time))
+                
+                cursor.execute('INSERT INTO GAMES_GB (GAME_ID, AWAY_TEAM, HOME_TEAM, GAME_LOCATION, GAME_DAY, GAME_TIME, WEEK_NUM) VALUES ({}, {}, {}, \'{}\', \'{}\', \'{}\', {})'
+                                .format(game_id, away_team_id, home_team_id, location, game_day, game_time, game_week_num))
+                cursor.commit()
+                
         print()
     print()
     print()
