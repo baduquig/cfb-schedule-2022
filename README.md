@@ -13,11 +13,14 @@ Project repository to practice web scraping, data wrangling and transformation, 
 <u>Sub level URL</u>: https://[]()www.espn.com/college-football/schedule/_/week/**week number**
 
 
+<u>Forward geocoding API</u>: https://geocode.maps.co/
+
 <br>
 <br>
 
 ## Resources
 - [GeeksforGeeks web scraping tutorial](https://www.geeksforgeeks.org/python-web-scraping-tutorial/)
+- [Python SQL Server driver - pyodbc](https://docs.microsoft.com/en-us/sql/connect/python/pyodbc/python-sql-driver-pyodbc?view=sql-server-ver16)
 
 <br>
 <br>
@@ -59,12 +62,14 @@ __Phase 5 - Data load__
 - Create team-conference dictionary
 - Insert parsed data into database
 
+<br>
+
+## _Iteration 3_
+
 __Phase 6 - Visualization skeleton__
 - Research US geography data visualization in Python
 - Create skeleton dashboard
 - Create views/stored procedures for location-based data points
-
-## _Iteration 3_
 
 __Phase 7 - Polish visualization__
 - Display additional data on hover action
