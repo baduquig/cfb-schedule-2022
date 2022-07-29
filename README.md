@@ -7,11 +7,10 @@ Project repository to practice web scraping, data wrangling and transformation, 
 ## Data source
 [ESPN FBS (I-A) Conference Schedule](https://www.espn.com/college-football/schedule)
 
-<u>Top level URL</u>: https://[]()www.espn.com/college-football/schedule
+<u>Top level Schedules URL</u>: https://www.espn.com/college-football/schedule
+<u>Sub level Schedules URL</u>: https://www.espn.com/college-football/schedule/_/week/**week-number**
 
-
-<u>Sub level URL</u>: https://[]()www.espn.com/college-football/schedule/_/week/**week number**
-
+<u>Sub level Teams URL</u>: https://www.espn.com/college-football/team/_/id/**team-id**
 
 <u>Forward geocoding API</u>: https://geocode.maps.co/
 
