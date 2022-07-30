@@ -12,7 +12,7 @@ cursor = conn.cursor()
 # Instantiate games data frame
 sql_select = 'SELECT * FROM GET_ALL_GAMES_VW;'
 df = pd.read_sql(sql_select, conn)
-print(list(df['WEEK_NUM']))
+
 # Instantiate initial dropdown values
 weeks = df['WEEK_NUM'].unique()
 conferences = df['HOME_CONFERENCE'].unique()
@@ -114,6 +114,18 @@ def set_gamedate_options(selected_weeks):
     weeks = df[df['WEEK_NUM'].isin(selected_weeks)]
     dates = weeks['GAME_DAY'].unique()
     return dates
+
+
+# Teams dropdown list
+@app.callback(
+    Output('team', 'options'),
+    Input('conf', 'value'),
+    prevent_initial_call=True
+)
+def set_gamedate_options(selected_conferences):
+    conferences = df[df['HOME_CONFERENCE'].isin(selected_conferences)]
+    teams = conferences['HOME_SCHOOL'].unique()
+    return teams
 
 #~~~ Callbacks ~~~#
 
