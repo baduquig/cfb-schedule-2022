@@ -156,6 +156,7 @@ def plot_games(selected_week, selected_conferences, selected_days, selected_team
     # only week and conference chosen
     elif ((selected_days is None or selected_days == [])
     and (selected_teams is None or selected_teams == [])):
+        print(selected_conferences)
         games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
                 or games['HOME_CONFERENCE'].isin(selected_conferences)]
     # only team blank
@@ -167,21 +168,25 @@ def plot_games(selected_week, selected_conferences, selected_days, selected_team
     elif (selected_days is None or selected_days == []):
         games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
                 or games['HOME_CONFERENCE'].isin(selected_conferences)]
-        games = games[games['AWAY_TEAM'].isin(selected_teams)
-                or games['HOME_TEAM'].isin(selected_teams)]
+        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
+                or games['HOME_SCHOOL'].isin(selected_teams)]
     else:
         games = games[games['GAME_DAY'].isin(selected_days)]
         games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
                 or games['HOME_CONFERENCE'].isin(selected_conferences)]
-        games = games[games['AWAY_TEAM'].isin(selected_teams)
-                or games['HOME_TEAM'].isin(selected_teams)]
+        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
+                or games['HOME_SCHOOL'].isin(selected_teams)]
+    
+    game_info = games['AWAY_SCHOOL'] + ' at ' + games['HOME_SCHOOL'] + ' | ' + games['GAME_TIME'] + ', ' + games['GAME_LOCATION']
     
     fig = go.Figure(data=go.Scattergeo(
         locationmode='USA-states',
+        text=game_info,
         lat=games['LATITUDE'],
         lon=games['LONGITUDE']
     ))
     fig.update_layout(
+        margin={"r":0,"t":0,"l":0,"b":0},
         geo = dict(
             scope='usa'
         )
