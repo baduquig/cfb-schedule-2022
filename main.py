@@ -1,5 +1,5 @@
 from dash import Dash, html, dcc, Input, Output
-#import plotly.express as px
+import datetime
 import plotly.graph_objects as go
 import pandas as pd
 import pyodbc
@@ -19,7 +19,13 @@ weeks = df['WEEK_NUM'].unique()
 conferences = df['HOME_CONFERENCE'].unique()
 
 # Get current week
+today = datetime.datetime.now()
+first_week = datetime.datetime(2022, 9, 5)
 default_week = 1
+while today >= first_week:
+    first_week += first_week + datetime.timedelta(days=7)
+    default_week += 1
+
 
 app.layout = html.Div(
     className='app-container',
