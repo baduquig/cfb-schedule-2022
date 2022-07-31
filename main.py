@@ -1,5 +1,6 @@
 from dash import Dash, html, dcc, Input, Output
-import plotly.express as px
+#import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 import pyodbc
 
@@ -17,6 +18,8 @@ df = pd.read_sql(sql_select, conn)
 weeks = df['WEEK_NUM'].unique()
 conferences = df['HOME_CONFERENCE'].unique()
 
+# Get current week
+default_week = 1
 
 app.layout = html.Div(
     className='app-container',
@@ -41,8 +44,8 @@ app.layout = html.Div(
                                 html.Label('Week'),
                                 dcc.Dropdown(
                                     weeks,
-                                    id='week',
-                                    multi=True
+                                    value=default_week,
+                                    id='week'
                                 )
                             ]
                         ),# end 'week-div' div
@@ -96,7 +99,7 @@ app.layout = html.Div(
         ),
 
         # Map
-        dcc.Graph()
+        dcc.Graph(id='map')
 
     ]# end 'app-container' div
 )# end app.layout
@@ -110,8 +113,8 @@ app.layout = html.Div(
     Input('week', 'value'),
     prevent_initial_call=True
 )
-def set_gamedate_options(selected_weeks):
-    weeks = df[df['WEEK_NUM'].isin(selected_weeks)]
+def set_gamedate_options(selected_week):
+    weeks = df[df['WEEK_NUM'] == selected_week]
     dates = weeks['GAME_DAY'].unique()
     return dates
 
@@ -127,6 +130,58 @@ def set_gamedate_options(selected_conferences):
     teams = conferences['HOME_SCHOOL'].unique()
     return teams
 
+
+@app.callback(
+    Output('map', 'figure'),
+    Input('week', 'value'),
+    Input('conf', 'value'),
+    Input('day', 'value'),
+    Input('team', 'value')
+)
+def plot_games(selected_week, selected_conferences, selected_days, selected_teams):
+    games = df
+    games = games[games['WEEK_NUM'] == selected_week]
+
+    # only week chosen
+    if((selected_conferences is None or selected_conferences == [])
+    and (selected_days is None or selected_days == [])
+    and (selected_teams is None or selected_teams == [])):
+        pass
+    # only week and conference chosen
+    elif ((selected_days is None or selected_days == [])
+    and (selected_teams is None or selected_teams == [])):
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+    # only team blank
+    elif (selected_teams is None or selected_teams == []):
+        games = games[games['GAME_DAY'].isin(selected_days)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+    # only day blank
+    elif (selected_days is None or selected_days == []):
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_TEAM'].isin(selected_teams)
+                or games['HOME_TEAM'].isin(selected_teams)]
+    else:
+        games = games[games['GAME_DAY'].isin(selected_days)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_TEAM'].isin(selected_teams)
+                or games['HOME_TEAM'].isin(selected_teams)]
+    
+    fig = go.Figure(data=go.Scattergeo(
+        locationmode='USA-states',
+        lat=games['LATITUDE'],
+        lon=games['LONGITUDE']
+    ))
+    fig.update_layout(
+        geo = dict(
+            scope='usa'
+        )
+    )
+
+    return fig
 #~~~ Callbacks ~~~#
 
 

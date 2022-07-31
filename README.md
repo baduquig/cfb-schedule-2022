@@ -20,6 +20,7 @@ Project repository to practice web scraping, data wrangling and transformation, 
 ## Resources
 - [GeeksforGeeks web scraping tutorial](https://www.geeksforgeeks.org/python-web-scraping-tutorial/)
 - [Python SQL Server driver - pyodbc](https://docs.microsoft.com/en-us/sql/connect/python/pyodbc/python-sql-driver-pyodbc?view=sql-server-ver16)
+- [Scatter Plots on Maps in Python](https://plotly.com/python/scatter-plots-on-maps/)
 
 <br>
 <br>
