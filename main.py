@@ -36,29 +36,26 @@ def filter_df(selected_week, selected_conferences, selected_days, selected_teams
     and (selected_days is None or selected_days == [])
     and (selected_teams is None or selected_teams == [])):
         pass
+    # only week and day chosen
+    elif ((selected_conferences is None or selected_conferences == [])
+    and (selected_teams is None or selected_teams == [])):
+        games = games[games['GAME_DAY'].isin(selected_days)]
     # only week and conference chosen
     elif ((selected_days is None or selected_days == [])
     and (selected_teams is None or selected_teams == [])):
-        print(selected_conferences)
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences) | games['HOME_CONFERENCE'].isin(selected_conferences)]
     # only team blank
     elif (selected_teams is None or selected_teams == []):
         games = games[games['GAME_DAY'].isin(selected_days)]
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences) | games['HOME_CONFERENCE'].isin(selected_conferences)]
     # only day blank
     elif (selected_days is None or selected_days == []):
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
-        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
-                or games['HOME_SCHOOL'].isin(selected_teams)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences) | games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_SCHOOL'].isin(selected_teams) | games['HOME_SCHOOL'].isin(selected_teams)]
     else:
         games = games[games['GAME_DAY'].isin(selected_days)]
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
-        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
-                or games['HOME_SCHOOL'].isin(selected_teams)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences) | games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_SCHOOL'].isin(selected_teams) | games['HOME_SCHOOL'].isin(selected_teams)]
     
     return games
 
@@ -155,8 +152,7 @@ app.layout = html.Div(
 # Game dates dropdown list
 @app.callback(
     Output('day', 'options'),
-    Input('week', 'value'),
-    prevent_initial_call=True
+    Input('week', 'value')
 )
 def set_gamedate_options(selected_week):
     weeks = df[df['WEEK_NUM'] == selected_week]
@@ -215,7 +211,7 @@ def plot_games(selected_week, selected_conferences, selected_days, selected_team
 def generate_grid(selected_week, selected_conferences, selected_days, selected_teams):
     games = filter_df(selected_week, selected_conferences, selected_days, selected_teams)
 
-    games.sort_values(by=['GAME_DAY'], inplace=True)
+    games.sort_values(by=['GAME_DAY', 'GAME_TIME'], inplace=True)
     games['AWAY'] = games['AWAY_SCHOOL'] + ' ' + games['AWAY_MASCOT']
     games['HOME'] = games['HOME_SCHOOL'] + ' ' + games['HOME_MASCOT']
 
