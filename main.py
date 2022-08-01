@@ -26,6 +26,42 @@ while today >= first_week:
     first_week += first_week + datetime.timedelta(days=7)
     default_week += 1
 
+# Filter schedule
+def filter_df(selected_week, selected_conferences, selected_days, selected_teams):
+    games = df
+    games = games[games['WEEK_NUM'] == selected_week]
+
+    # only week chosen
+    if((selected_conferences is None or selected_conferences == [])
+    and (selected_days is None or selected_days == [])
+    and (selected_teams is None or selected_teams == [])):
+        pass
+    # only week and conference chosen
+    elif ((selected_days is None or selected_days == [])
+    and (selected_teams is None or selected_teams == [])):
+        print(selected_conferences)
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+    # only team blank
+    elif (selected_teams is None or selected_teams == []):
+        games = games[games['GAME_DAY'].isin(selected_days)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+    # only day blank
+    elif (selected_days is None or selected_days == []):
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
+                or games['HOME_SCHOOL'].isin(selected_teams)]
+    else:
+        games = games[games['GAME_DAY'].isin(selected_days)]
+        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
+                or games['HOME_CONFERENCE'].isin(selected_conferences)]
+        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
+                or games['HOME_SCHOOL'].isin(selected_teams)]
+    
+    return games
+
 
 app.layout = html.Div(
     className='app-container',
@@ -105,7 +141,10 @@ app.layout = html.Div(
         ),
 
         # Map
-        dcc.Graph(id='map')
+        dcc.Graph(id='map'),
+
+        # Games grid table
+        html.Div(id='grid')
 
     ]# end 'app-container' div
 )# end app.layout
@@ -137,6 +176,7 @@ def set_gamedate_options(selected_conferences):
     return teams
 
 
+# Render map
 @app.callback(
     Output('map', 'figure'),
     Input('week', 'value'),
@@ -145,37 +185,7 @@ def set_gamedate_options(selected_conferences):
     Input('team', 'value')
 )
 def plot_games(selected_week, selected_conferences, selected_days, selected_teams):
-    games = df
-    games = games[games['WEEK_NUM'] == selected_week]
-
-    # only week chosen
-    if((selected_conferences is None or selected_conferences == [])
-    and (selected_days is None or selected_days == [])
-    and (selected_teams is None or selected_teams == [])):
-        pass
-    # only week and conference chosen
-    elif ((selected_days is None or selected_days == [])
-    and (selected_teams is None or selected_teams == [])):
-        print(selected_conferences)
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
-    # only team blank
-    elif (selected_teams is None or selected_teams == []):
-        games = games[games['GAME_DAY'].isin(selected_days)]
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
-    # only day blank
-    elif (selected_days is None or selected_days == []):
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
-        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
-                or games['HOME_SCHOOL'].isin(selected_teams)]
-    else:
-        games = games[games['GAME_DAY'].isin(selected_days)]
-        games = games[games['AWAY_CONFERENCE'].isin(selected_conferences)
-                or games['HOME_CONFERENCE'].isin(selected_conferences)]
-        games = games[games['AWAY_SCHOOL'].isin(selected_teams)
-                or games['HOME_SCHOOL'].isin(selected_teams)]
+    games = filter_df(selected_week, selected_conferences, selected_days, selected_teams)
     
     game_info = games['AWAY_SCHOOL'] + ' at ' + games['HOME_SCHOOL'] + ' | ' + games['GAME_TIME'] + ', ' + games['GAME_LOCATION']
     
@@ -191,8 +201,39 @@ def plot_games(selected_week, selected_conferences, selected_days, selected_team
             scope='usa'
         )
     )
-
     return fig
+
+
+# Render grid
+@app.callback(
+    Output('grid', 'children'),
+    Input('week', 'value'),
+    Input('conf', 'value'),
+    Input('day', 'value'),
+    Input('team', 'value')
+)
+def generate_grid(selected_week, selected_conferences, selected_days, selected_teams):
+    games = filter_df(selected_week, selected_conferences, selected_days, selected_teams)
+
+    games.sort_values(by=['GAME_DAY'], inplace=True)
+    games['AWAY'] = games['AWAY_SCHOOL'] + ' ' + games['AWAY_MASCOT']
+    games['HOME'] = games['HOME_SCHOOL'] + ' ' + games['HOME_MASCOT']
+
+    games = games.drop(['WEEK_NUM', 'AWAY_SCHOOL', 'AWAY_MASCOT', 'AWAY_CONFERENCE', 'HOME_SCHOOL', 
+                        'HOME_MASCOT', 'HOME_CONFERENCE', 'LATITUDE', 'LONGITUDE'], axis=1)
+
+    return html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in games.columns])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(games.iloc[i][col]) for col in games.columns
+            ]) for i in range(len(games))
+        ])
+    ])
+
+
 #~~~ Callbacks ~~~#
 
 
