@@ -3,6 +3,7 @@
     background-image: url('./images/bg');
     background-repeat: no-repeat;
     background-size: cover;
+    color: #ffffff;
     text-align: center;
 }
 
@@ -24,10 +25,14 @@
 }
 
 #grid {
+    background-color: #ffffff;
+    margin: 0 10%;
+    opacity: .8;
     text-align: left;
 }
 
 table {
+    color: #000000;
     border-collapse: collapse;
     margin: 25px auto;
 }
