@@ -1,3 +1,4 @@
+from turtle import color
 from dash import Dash, html, dcc, Input, Output
 import datetime
 import plotly.graph_objects as go
@@ -187,9 +188,10 @@ def plot_games(selected_week, selected_conferences, selected_days, selected_team
     
     fig = go.Figure(data=go.Scattergeo(
         locationmode='USA-states',
-        text=game_info,
         lat=games['LATITUDE'],
-        lon=games['LONGITUDE']
+        lon=games['LONGITUDE'],
+        marker = {'color': 'black'},
+        text=game_info
     ))
     fig.update_layout(
         margin={"r":0,"t":0,"l":0,"b":0},
