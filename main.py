@@ -1,4 +1,3 @@
-from turtle import color
 from dash import Dash, html, dcc, Input, Output
 import datetime
 import plotly.graph_objects as go
